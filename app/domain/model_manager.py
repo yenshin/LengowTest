@@ -1,3 +1,5 @@
+import json
+import uuid
 import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from typing import Dict
@@ -7,6 +9,7 @@ import requests
 from app.domain import domain_const
 from app.domain.model.currency_rate import CurrencyRate
 from app.domain.model.daily_reference import DailyReference
+from app.tools.logger import Logger, LogType
 from app.tools.singleton import Singleton
 
 # INFO: this class aim to single entry point to access data
@@ -24,9 +27,9 @@ class DataManager(metaclass=Singleton):
     __daily_refs: DailyReference | None = None
 
     def __init__(self):
-        self.UpdateReference()
+        self.update_reference()
 
-    def UpdateReference(self):
+    def update_reference(self):
         response = requests.get(domain_const.REF_URLCONVERSION)
         xmlRoot = ET.fromstring(response.content)
         currDict: Dict[str, CurrencyRate] = {}
@@ -47,8 +50,18 @@ class DataManager(metaclass=Singleton):
             key = cube.attrib[domain_const.REF_XMLCURRENCY_KNAME]
             value = cube.attrib[domain_const.REF_XMLCURRENCY_KRATE]
             currDict[key] = CurrencyRate(key, float(value))
+        # INFO: to simplify utilisation I add eur
+        if "EUR" not in currDict:
+            currDict["EUR"] = CurrencyRate("EUR", 1.0)
+
         # INFO: add a new entry to the data
         self.__daily_refs = DailyReference(documentDate, currDict)
 
-    def Log(self):
-        print(self.__daily_refs)
+    def log(self):
+        Logger.push_log(LogType.INFO, str(self.__daily_refs))
+
+    def get_daily_ref(self) -> DailyReference | None:
+        return self.__daily_refs
+
+    def get_currencies(self) -> Dict[str, CurrencyRate]:
+        return self.__daily_refs.currencies
