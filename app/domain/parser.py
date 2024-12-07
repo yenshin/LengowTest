@@ -55,6 +55,10 @@ class _Lexer(metaclass=Singleton):
         return token
 
     def tokenize(self, input_text):
+        # INFO: lower case to avoid useless parsing
+        input_text = input_text.lower()
+
+        # INFO: split into words
         words = input_text.split()
         tokens = []
 
