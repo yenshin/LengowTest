@@ -5,15 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "FastAPI",
+            "name": "Python Debugger: FastAPI",
             "type": "debugpy",
             "request": "launch",
-            "module": "fastapi",
+            "module": "uvicorn",
             "args": [
-                "dev",
-                "app/main.py"
+                "app.main:app",
+                "--reload"
             ],
-            "console": "integratedTerminal"
+            "jinja": true
         },
         {
             "name": "Pytest",

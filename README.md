@@ -1,5 +1,11 @@
 #INFO: It's like a log book, each item are separated by ---------------
 # ---------------
+How to run: 
+    - install poetry
+    - poetry install
+    - poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
+
+# ---------------
 I set up my environment:
 I start with, imo the most simplified environment
 setting up a route for money conversion
