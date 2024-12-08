@@ -1,16 +1,16 @@
 from typing import Any, Optional, Union
+
 from pydantic import (
-    field_validator,
     PostgresDsn,
     ValidationInfo,
+    field_validator,
 )
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "technical-test"
-    VERSION: str = "0.2.0"
+    VERSION: str = "0.1.0"
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str

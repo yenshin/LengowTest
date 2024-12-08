@@ -1,10 +1,14 @@
 #INFO: It's like a log book, each item are separated by ---------------
 # HOW to
 first set up the db
-    Create an empty `.env` file.
+    copy app.env in `.env` file.
+
     Depending on your docker and docker-compose setup you might need to use
     `docker-compose up -d` or `docker compose up -d`
-    Once the container run, you should be able to access the docs at http://localhost:8080/docs
+    then  call ```make create-db``` to create the db
+
+then update the db content with 
+```typer .\scripts\update_db.py run```
 
 then run the server locally: 
 
@@ -12,7 +16,11 @@ then run the server locally:
     - poetry install
     - poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
 
-
+note for windows user:
+    poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
+    in cmd (not power shell) you can use cmdenv.bat to correctly set 
+    the env var
+    
 # History
 # ---------------
 I set up my environment:

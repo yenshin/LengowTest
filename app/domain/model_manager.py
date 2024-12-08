@@ -4,6 +4,7 @@ from typing import Dict
 
 import requests
 
+import app.db.repository as rep
 from app.domain import domain_const
 from app.domain.model.currency_rate import CurrencyRate
 from app.domain.model.daily_reference import DailyReference
@@ -25,7 +26,7 @@ class DataManager(metaclass=Singleton):
     __daily_refs: DailyReference | None = None
 
     def __init__(self):
-        self.update_reference()
+        self.__initialize()
 
     def update_reference(self):
         response = requests.get(domain_const.REF_URLCONVERSION)
@@ -54,6 +55,18 @@ class DataManager(metaclass=Singleton):
 
         # INFO: add a new entry to the data
         self.__daily_refs = DailyReference(documentDate, currDict)
+
+    def __initialize(self):
+        repository = rep.Repository()
+        tmpdata = repository.GetLastDayliReference()
+        if tmpdata is None:
+            self.update_reference()
+            if self.__daily_refs is not None:
+                repository.PushNewDayliReference(self.__daily_refs)
+            else:
+                raise Exception("cant init from the db or the ref site")
+        else:
+            self.__daily_refs = tmpdata
 
     def log(self):
         Logger.push_log(LogType.INFO, str(self.__daily_refs))

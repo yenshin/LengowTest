@@ -23,6 +23,13 @@
             "args": [
                 "app/tests/test_routes.py"],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "PY UPDATE DB clitest",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "scripts/update_db.py",
+            "console": "integratedTerminal"
         }
     ]
 }
