@@ -69,6 +69,7 @@ app.domain.currencies_const
 
 # ---------------
 I had many test
+    ```
     - working test 
         - "10.32 euros en dollars" default test
         - "10.32 eurs = dollar" other words
@@ -81,7 +82,7 @@ I had many test
         - "10.32 eurs dollar américains" missing element in query
         - "10.32 euro européen = dollar amricains" spell error in currency
         - "10.32 USD USD =" query not correctly ordered
-
+    ```
 I recommend you to install pytest-cov to have a good idea
 of testing coverage
 
@@ -89,3 +90,8 @@ of testing coverage
 fix dependency order
 add more info
 prepare data for postgresDB
+
+# ---------------
+prepare a docker image
+a prepare a db
+note: not enough time to do it properly
