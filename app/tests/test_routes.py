@@ -117,3 +117,12 @@ def test_money_routes(api_client):
     # INFO: 10.328 => 10.33
     # and also all code are in upper case even for input
     assert "10.3285146196 JPY = 10.33 JPY" == finded_answer.answer
+
+    # INFO: test with arg in wrong order
+    query.query = "10.32 USD USD ="
+    response = api_client.post(
+        url,
+        json=json.loads(query.model_dump_json()),
+    )
+    finded_answer = OutputAnswer.model_validate(response.json())
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR

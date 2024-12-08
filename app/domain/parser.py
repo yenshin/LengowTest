@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 
 from app.api.schema.intput_query import InputQuery
 from app.api.schema.output_answer import OutputAnswer
@@ -12,7 +12,16 @@ from app.tools.singleton import Singleton
 class TokenType(Enum):
     NUMBER = auto()
     CURRENCY = auto()
-    CONVERT = auto()
+    LINKER = auto()
+
+
+# INFO: this is used to avoid doing blabl[i] without knowig wht is i about
+class TokenListId(IntEnum):
+    # INFO: we need to start at 0, other wise first auto = 1
+    SRC_NUMBER = 0
+    SRC_CURRENCY = auto()
+    LINKER = auto()
+    DST_CURRENCY = auto()
 
 
 @dataclass
@@ -85,15 +94,20 @@ class _Lexer(metaclass=Singleton):
                 i += 1
                 continue
 
-            # find linker, not mendatory so no need to add
+            # INFO: find linker, add it to check order of words
             # multiple word not managed
             if linker_found is False:
-                if words[i].lower() in currencies_const.REF_CONVERSIONLINKER:
+                if words[i] in currencies_const.REF_CONVERSIONLINKER:
                     linker_found = True
+                    token = Token(
+                        type=TokenType.LINKER,
+                        value=words[i],
+                    )
+                    tokens.append(token)
                     i += 1
                     continue
 
-            # try to find if words match currency (code, name ou adjective)
+            # INFO: try to find if words match currency (code, name ou adjective)
             currency_code, words_used = self.find_currency_code(words, i)
             if words_used <= 0:
                 raise Exception(f"unidentified currency word : {words[i]}")
@@ -126,10 +140,10 @@ class _Parser(metaclass=Singleton):
     def __transform_result(self, tokens) -> OutputAnswer | None:
         data_mgr = DataManager()  # singleton
         currencies = data_mgr.get_currencies()
-        src_amount = tokens[0].value
+        src_amount = tokens[TokenListId.SRC_NUMBER].value
         dst_amount = 0.0
-        src_curr = tokens[1].value
-        dst_curr = tokens[2].value
+        src_curr = tokens[TokenListId.SRC_CURRENCY].value
+        dst_curr = tokens[TokenListId.DST_CURRENCY].value
 
         eur_amount = src_amount
         # INFO: 1 / rate because it's reverse
@@ -145,10 +159,11 @@ class _Parser(metaclass=Singleton):
         tokens = self.lexer.tokenize(data)
         # INFO: validation verification
         if (
-            len(tokens) == 3
-            and tokens[0].type == TokenType.NUMBER
-            and tokens[1].type == TokenType.CURRENCY
-            and tokens[2].type == TokenType.CURRENCY
+            len(tokens) == 4
+            and tokens[TokenListId.SRC_NUMBER].type == TokenType.NUMBER
+            and tokens[TokenListId.SRC_CURRENCY].type == TokenType.CURRENCY
+            and tokens[TokenListId.LINKER].type == TokenType.LINKER
+            and tokens[TokenListId.DST_CURRENCY].type == TokenType.CURRENCY
         ):
             return self.__transform_result(tokens)
         print("syntax error")
@@ -158,10 +173,9 @@ class _Parser(metaclass=Singleton):
 def ParseQuery(input_query: InputQuery) -> OutputAnswer | None:
     toReturn = None
     try:
-        # not just allocate once because it's a singleton
+        # INFO: not just allocate once because it's a singleton
         parser = _Parser()
         toReturn = parser.parse(input_query.query)
-
     except Exception as e:
         additionnalInfo: str = str(e)
         Logger.push_log(LogType.ERROR, "parse failed", additionnalInfo)
