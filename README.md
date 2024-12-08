@@ -8,7 +8,7 @@ first set up the db
     then  call ```make create-db``` to create the db
 
 then update the db content with 
-```typer .\scripts\update_db.py run```
+```poetry run python .\scripts\update_db.py```
 
 then run the server locally: 
 
@@ -17,10 +17,8 @@ then run the server locally:
     - poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
 
 note for windows user:
-    poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
-    in cmd (not power shell) you can use cmdenv.bat to correctly set 
-    the env var
-    
+    - use ```cmdenv.bat``` to correctly set the env var
+
 # History
 # ---------------
 I set up my environment:
