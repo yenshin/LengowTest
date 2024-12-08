@@ -1,10 +1,19 @@
 #INFO: It's like a log book, each item are separated by ---------------
-# ---------------
-How to run: 
+# HOW to
+first set up the db
+    Create an empty `.env` file.
+    Depending on your docker and docker-compose setup you might need to use
+    `docker-compose up -d` or `docker compose up -d`
+    Once the container run, you should be able to access the docs at http://localhost:8080/docs
+
+then run the server locally: 
+
     - install poetry
     - poetry install
     - poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
 
+
+# History
 # ---------------
 I set up my environment:
 I start with, imo the most simplified environment
@@ -69,3 +78,8 @@ I had many test
 
 I recommend you to install pytest-cov to have a good idea
 of testing coverage
+
+# ---------------
+fix dependency order
+add more info
+prepare data for postgresDB

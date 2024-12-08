@@ -1,5 +1,0 @@
-ply
-fastapi
-# for session maker
-fastapi-utils
-requests

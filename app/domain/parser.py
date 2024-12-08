@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
 
-from app.api.schema.intput_query import InputQuery
-from app.api.schema.output_answer import OutputAnswer
 from app.domain import currencies_const
 from app.domain.model_manager import DataManager
 from app.tools.logger import Logger, LogType
@@ -137,7 +135,7 @@ class _Parser(metaclass=Singleton):
     def __init__(self):
         self.lexer = _Lexer()
 
-    def __transform_result(self, tokens) -> OutputAnswer | None:
+    def __transform_result(self, tokens) -> str | None:
         data_mgr = DataManager()  # singleton
         currencies = data_mgr.get_currencies()
         src_amount = tokens[TokenListId.SRC_NUMBER].value
@@ -153,9 +151,9 @@ class _Parser(metaclass=Singleton):
 
         # INFO: only output amount is 2 digit max
         answer = f"{src_amount} {src_curr} = {dst_amount:.2f} {dst_curr}"
-        return OutputAnswer(answer=answer)
+        return answer
 
-    def parse(self, data: str) -> OutputAnswer | None:
+    def parse(self, data: str) -> str | None:
         tokens = self.lexer.tokenize(data)
         # INFO: validation verification
         if (
@@ -170,12 +168,12 @@ class _Parser(metaclass=Singleton):
         return None
 
 
-def ParseQuery(input_query: InputQuery) -> OutputAnswer | None:
+def parse_query(input_query: str) -> str | None:
     toReturn = None
     try:
         # INFO: not just allocate once because it's a singleton
         parser = _Parser()
-        toReturn = parser.parse(input_query.query)
+        toReturn = parser.parse(input_query)
     except Exception as e:
         additionnalInfo: str = str(e)
         Logger.push_log(LogType.ERROR, "parse failed", additionnalInfo)

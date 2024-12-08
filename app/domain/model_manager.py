@@ -1,7 +1,5 @@
-import json
-import uuid
 import xml.etree.ElementTree as ET
-from datetime import date, datetime
+from datetime import datetime
 from typing import Dict
 
 import requests
