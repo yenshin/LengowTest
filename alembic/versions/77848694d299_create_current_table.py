@@ -25,6 +25,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID, primary_key=True, nullable=False),
         sa.Column("date", sa.DATE, nullable=False),
         sa.Column("currencies", sa.JSON),
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
         op.f("idx_dailyreference_date"), "dailyreference", ["date"], unique=False

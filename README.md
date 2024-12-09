@@ -84,7 +84,7 @@ I had many test
         - "10.32 euro européen = dollar amricains" spell error in currency
         - "10.32 USD USD =" query not correctly ordered
     ```
-    
+
 I recommend you to install pytest-cov to have a good idea
 of testing coverage
 
@@ -95,6 +95,13 @@ prepare data for postgresDB
 
 # ---------------
 prepare a docker image
-a prepare a db
+prepare a db
 
 note: not enough time to do it properly
+
+# ---------------
+do a basic db model and a cli
+
+# ---------------
+improve the db system with alembic for db migration
+improve the db model to me more futur proof

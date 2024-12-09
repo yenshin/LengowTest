@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 
 from app.api.schema.intput_query import InputQuery
 from app.api.schema.output_answer import OutputAnswer
-from app.db.session import get_db
 
 
 @pytest.fixture

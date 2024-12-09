@@ -30,12 +30,6 @@ class Token:
 
 # INFO : lexical analysis.
 class _Lexer(metaclass=Singleton):
-    def __init__(self):
-        # INFO: it's a singleton, no problem to get the data
-        self.dailyref = DataManager().get_daily_ref()
-        if self.dailyref is None:
-            raise Exception("daily ref is None in the lexer")
-
     def find_currency_code(self, words, i):
         """
         try to find currency code, from index i

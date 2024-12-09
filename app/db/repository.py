@@ -1,12 +1,15 @@
 import json
 import uuid
 from dataclasses import dataclass
+from locale import currency
 
 from sqlalchemy import Date, cast
 from sqlmodel import desc
 
-from app.db.model.conversion import DailyReference as db_dayref
+from app.db.model.currency_rate import CurrencyRate as db_curate
+from app.db.model.daily_reference import DailyReference as db_dayref
 from app.db.session import get_db
+from app.domain.model.currency_rate import CurrencyRate as dom_curate
 from app.domain.model.daily_reference import DailyReference as dom_dayref
 from app.domain.model_manager import DataManager
 from app.tools.logger import Logger, LogType
@@ -19,18 +22,28 @@ class Repository(metaclass=Singleton):
         toReturn = False
         try:
             session = next(get_db())
-            jsondata = json.dumps(input_val.currencies, default=vars)
             db_ref = db_dayref(
                 # INFO: use uuid1 to order by date and hostname
                 id=uuid.uuid1(),
                 date=cast(input_val.date, Date),
-                currencies=jsondata,
             )
             session.add(db_ref)
             session.flush()
+            for key in input_val.currencies:
+                name: str = key
+                rate: float = input_val.currencies[key].rate
+                curate = db_curate(
+                    id=uuid.uuid4(),
+                    dailyref_id=db_ref.id,
+                    currency_type=name,
+                    currency_rate=rate,
+                )
+                session.add(curate)
+                session.flush()
             session.commit()
             toReturn = True
         except Exception as e:
+            session.rollback()
             additionnalInfo: str = str(e)
             # INFO: no clever message
             Logger.push_log(
@@ -46,9 +59,20 @@ class Repository(metaclass=Singleton):
             dbmod: dom_dayref = (
                 session.query(db_dayref).order_by(desc(db_dayref.id)).first()
             )
+            currlist = (
+                session.query(db_curate).where(db_curate.dailyref_id == dbmod.id).all()
+            )
+
             session.commit()
-            toReturn = dbmod.GetDomainModel()
+            toReturn = dom_dayref(date=dbmod.date, currencies={})
+            for curr in currlist:
+                toReturn.currencies[curr.currency_type] = dom_curate(
+                    currency=curr.currency_type,
+                    rate=curr.currency_rate,
+                )
+
         except Exception as e:
+            session.rollback()
             additionnalInfo: str = str(e)
             # INFO: no clever message
             Logger.push_log(
@@ -64,6 +88,7 @@ class Repository(metaclass=Singleton):
             toReturn = session.query(db_dayref.id).count()
             session.commit()
         except Exception as e:
+            session.rollback()
             toReturn = 0
             additionnalInfo: str = str(e)
             # INFO: no clever message
