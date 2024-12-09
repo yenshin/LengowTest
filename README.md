@@ -1,4 +1,3 @@
-#INFO: It's like a log book, each item are separated by ---------------
 # HOW to
 first set up the db
     copy app.env in `.env` file.
