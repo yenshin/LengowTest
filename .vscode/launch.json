@@ -30,6 +30,17 @@
             "request": "launch",
             "program": "scripts/update_db.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Alembic upgrade",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "alembic",
+            "args": [
+                "upgrade",
+                "head,"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }

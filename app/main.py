@@ -10,6 +10,7 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
 )
+
 init_domain(app)
 add_app_routes(app)
 # initialize domain data
