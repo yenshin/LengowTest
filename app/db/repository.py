@@ -8,13 +8,14 @@ from sqlmodel import desc
 from app.db.model.conversion import DailyReference as db_dayref
 from app.db.session import get_db
 from app.domain.model.daily_reference import DailyReference as dom_dayref
+from app.domain.model_manager import DataManager
 from app.tools.logger import Logger, LogType
 from app.tools.singleton import Singleton
 
 
 @dataclass
 class Repository(metaclass=Singleton):
-    def PushNewDayliReference(self, input_val: dom_dayref) -> bool:
+    def push_new_dayli_reference(self, input_val: dom_dayref) -> bool:
         toReturn = False
         try:
             session = next(get_db())
@@ -38,7 +39,7 @@ class Repository(metaclass=Singleton):
         finally:
             return toReturn
 
-    def GetLastDayliReference(self) -> dom_dayref | None:
+    def get_last_dayli_reference(self) -> dom_dayref | None:
         toReturn = None
         try:
             session = next(get_db())
@@ -55,3 +56,38 @@ class Repository(metaclass=Singleton):
             )
         finally:
             return toReturn
+
+    def count_dayli_reference(self) -> int:
+        toReturn = 0
+        try:
+            session = next(get_db())
+            toReturn = session.query(db_dayref.id).count()
+            session.commit()
+        except Exception as e:
+            toReturn = 0
+            additionnalInfo: str = str(e)
+            # INFO: no clever message
+            Logger.push_log(LogType.ERROR, "count failed", additionnalInfo)
+        finally:
+            return toReturn
+
+
+def initialize_domaindata_from_repository() -> bool:
+    repository = Repository()
+    datamanager = DataManager()
+    tmpdata = repository.get_last_dayli_reference()
+    if tmpdata is not None:
+        datamanager.initialize_from_outside(tmpdata)
+        return True
+    return False
+
+
+def initialize_repository_and_domaindata_from_refsite() -> bool:
+    datamanager = DataManager()
+    repository = Repository()
+    datamanager.update_reference()
+    dayliref = datamanager.get_daily_ref()
+    if dayliref is not None:
+        repository.push_new_dayli_reference(dayliref)
+        return True
+    return False

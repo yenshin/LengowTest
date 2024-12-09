@@ -4,7 +4,6 @@ from typing import Dict
 
 import requests
 
-import app.db.repository as rep
 from app.domain import domain_const
 from app.domain.model.currency_rate import CurrencyRate
 from app.domain.model.daily_reference import DailyReference
@@ -16,17 +15,16 @@ from app.tools.singleton import Singleton
 
 class DataManager(metaclass=Singleton):
     # INFO: here we use a single obj
+    #
     # we could use an dict(date, DailyReference)
     # if server is runnning for more than one day with
+    # job scheduling to automaticly update
+    # this could be a thing
     #
-    # job scheduling to automaticly update the data could be a thing
     # or maybe we could go for a dedicated service if this is a strong need
     # with frequent data update
     # => because it's job interview I need to limit my work
     __daily_refs: DailyReference | None = None
-
-    def __init__(self):
-        self.__initialize()
 
     def update_reference(self):
         response = requests.get(domain_const.REF_URLCONVERSION)
@@ -56,17 +54,8 @@ class DataManager(metaclass=Singleton):
         # INFO: add a new entry to the data
         self.__daily_refs = DailyReference(documentDate, currDict)
 
-    def __initialize(self):
-        repository = rep.Repository()
-        tmpdata = repository.GetLastDayliReference()
-        if tmpdata is None:
-            self.update_reference()
-            if self.__daily_refs is not None:
-                repository.PushNewDayliReference(self.__daily_refs)
-            else:
-                raise Exception("cant init from the db or the ref site")
-        else:
-            self.__daily_refs = tmpdata
+    def initialize_from_outside(self, input: DailyReference):
+        self.__daily_refs = input
 
     def log(self):
         Logger.push_log(LogType.INFO, str(self.__daily_refs))

@@ -27,7 +27,7 @@ def main():
     repository = Repository()
     daylyref = dataMgr.get_daily_ref()
     if daylyref is not None:
-        repository.PushNewDayliReference(daylyref)
+        repository.push_new_dayli_reference(daylyref)
     else:
         Logger.push_log(LogType.ERROR, " update db script: can't add entry to the db")
     print("db updated")
