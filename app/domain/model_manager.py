@@ -21,6 +21,8 @@ class DataManager(metaclass=Singleton):
     # job scheduling to automaticly update
     # this could be a thing
     #
+    # or update in a route
+    #
     # or maybe we could go for a dedicated service if this is a strong need
     # with frequent data update
     # => because it's job interview I need to limit my work

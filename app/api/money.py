@@ -35,7 +35,8 @@ async def convert_money(input_query: InputQuery, response: Response) -> OutputAn
     # no information provided to adapt this error code
     # just 200 if query is ok or 500 if query no understanble
     datamanager = DataManager()
+    currencies = datamanager.get_currencies()
     value = None
-    if datamanager.get_currencies() is not None:
-        value = parse_query(input_query.query, datamanager.get_currencies())
+    if currencies is not None:
+        value = parse_query(input_query.query, currencies)
     return __checkResponse(value, response)
