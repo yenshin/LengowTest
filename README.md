@@ -15,6 +15,9 @@ then run the server locally:
     - poetry install
     - poetry run python '-m' 'uvicorn' 'app.main:app' '--reload'
 
+    # alternatively you can run like this
+    - poetry run python -m pytest
+
 note for windows user:
     - use ```cmdenv.bat``` to correctly set the env var
 

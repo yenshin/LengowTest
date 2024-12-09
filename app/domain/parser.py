@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
+from typing import Dict
 
 from app.domain import currencies_const
+from app.domain.model.currency_rate import CurrencyRate
 from app.domain.model_manager import DataManager
 from app.tools.logger import Logger, LogType
 from app.tools.singleton import Singleton
@@ -129,9 +131,10 @@ class _Parser(metaclass=Singleton):
     def __init__(self):
         self.lexer = _Lexer()
 
-    def __transform_result(self, tokens) -> str | None:
+    def __transform_result(
+        self, tokens, currencies: Dict[str, CurrencyRate]
+    ) -> str | None:
         data_mgr = DataManager()  # singleton
-        currencies = data_mgr.get_currencies()
         src_amount = tokens[TokenListId.SRC_NUMBER].value
         dst_amount = 0.0
         src_curr = tokens[TokenListId.SRC_CURRENCY].value
@@ -147,7 +150,7 @@ class _Parser(metaclass=Singleton):
         answer = f"{src_amount} {src_curr} = {dst_amount:.2f} {dst_curr}"
         return answer
 
-    def parse(self, data: str) -> str | None:
+    def parse(self, data: str, currencies: Dict[str, CurrencyRate]) -> str | None:
         tokens = self.lexer.tokenize(data)
         # INFO: validation verification
         if (
@@ -157,17 +160,17 @@ class _Parser(metaclass=Singleton):
             and tokens[TokenListId.LINKER].type == TokenType.LINKER
             and tokens[TokenListId.DST_CURRENCY].type == TokenType.CURRENCY
         ):
-            return self.__transform_result(tokens)
+            return self.__transform_result(tokens, currencies)
         print("syntax error")
         return None
 
 
-def parse_query(input_query: str) -> str | None:
+def parse_query(input_query: str, currencies: Dict[str, CurrencyRate]) -> str | None:
     toReturn = None
     try:
         # INFO: not just allocate once because it's a singleton
         parser = _Parser()
-        toReturn = parser.parse(input_query)
+        toReturn = parser.parse(input_query, currencies)
     except Exception as e:
         additionnalInfo: str = str(e)
         Logger.push_log(LogType.ERROR, "parse failed", additionnalInfo)

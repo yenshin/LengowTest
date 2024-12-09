@@ -3,6 +3,7 @@ from fastapi import APIRouter, Response, status
 from app.api.schema import schema_const
 from app.api.schema.intput_query import InputQuery
 from app.api.schema.output_answer import OutputAnswer
+from app.domain.model_manager import DataManager
 from app.domain.parser import parse_query
 
 router = APIRouter()
@@ -33,5 +34,8 @@ async def convert_money(input_query: InputQuery, response: Response) -> OutputAn
     # INFO: is input_query is not set default fastapi answer is 422
     # no information provided to adapt this error code
     # just 200 if query is ok or 500 if query no understanble
-    value = __checkResponse(parse_query(input_query.query), response)
-    return value
+    datamanager = DataManager()
+    value = None
+    if datamanager.get_currencies() is not None:
+        value = parse_query(input_query.query, datamanager.get_currencies())
+    return __checkResponse(value, response)
